@@ -16,12 +16,10 @@
  */
 package com.shieldblaze.extendedemailvalidator.api.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shieldblaze.extendedemailvalidator.api.internal.DelegatingValidationContext;
 import com.shieldblaze.extendedemailvalidator.api.dto.EmailValidation;
+import com.shieldblaze.extendedemailvalidator.api.internal.DelegatingValidationContext;
 import com.shieldblaze.extendedemailvalidator.core.ValidatingChain;
 import com.shieldblaze.extendedemailvalidator.core.ValidationContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,9 +37,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class ValidationController {
 
     private final ValidatingChain validatingChain;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     public ValidationController(ValidatingChain validatingChain) {
         this.validatingChain = validatingChain;
