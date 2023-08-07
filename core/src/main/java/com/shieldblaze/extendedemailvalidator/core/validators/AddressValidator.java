@@ -14,11 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.shieldblaze.emailvalidator4j.validators;
+package com.shieldblaze.extendedemailvalidator.core.validators;
 
 import com.sanctionco.jmail.JMail;
-import com.shieldblaze.emailvalidator4j.ValidationContext;
-import com.shieldblaze.emailvalidator4j.Validator;
+import com.shieldblaze.extendedemailvalidator.core.ValidationContext;
+import com.shieldblaze.extendedemailvalidator.core.Validator;
 
 /**
  * Performs validation of email address using Simple Email Validator.

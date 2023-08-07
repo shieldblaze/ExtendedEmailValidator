@@ -14,13 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.shieldblaze.emailvalidator4j.validators;
+package com.shieldblaze.extendedemailvalidator.core.validators;
 
 import com.sanctionco.jmail.Email;
 import com.sanctionco.jmail.JMail;
-import com.shieldblaze.emailvalidator4j.NetworkConfig;
-import com.shieldblaze.emailvalidator4j.ValidationContext;
-import com.shieldblaze.emailvalidator4j.Validator;
+import com.shieldblaze.extendedemailvalidator.core.NetworkConfig;
+import com.shieldblaze.extendedemailvalidator.core.ValidationContext;
+import com.shieldblaze.extendedemailvalidator.core.Validator;
 import org.xbill.DNS.AAAARecord;
 import org.xbill.DNS.ARecord;
 import org.xbill.DNS.ExtendedResolver;
