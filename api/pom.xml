@@ -51,7 +51,7 @@
         <dependency>
             <groupId>com.shieldblaze.extendedemailvalidator</groupId>
             <artifactId>core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 </project>
