@@ -19,16 +19,11 @@ package com.shieldblaze.extendedemailvalidator.api.internal;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shieldblaze.extendedemailvalidator.core.ValidationContext;
 
-public class DelegatingValidationContext {
-
-    @JsonProperty
-    private final boolean addressValidationPassed;
-
-    @JsonProperty
-    private final boolean mxValidationPassed;
+public record DelegatingValidationContext(@JsonProperty boolean addressValidationPassed,
+                                          @JsonProperty boolean mxValidationPassed,
+                                          @JsonProperty boolean mailServerConnectionPassed) {
 
     public DelegatingValidationContext(ValidationContext validationContext) {
-        this.addressValidationPassed = validationContext.addressValidationPassed();
-        this.mxValidationPassed = validationContext.mxValidationPassed();
+        this(validationContext.addressValidationPassed(), validationContext.mxValidationPassed(), validationContext.mailServerConnectionPassed());
     }
 }

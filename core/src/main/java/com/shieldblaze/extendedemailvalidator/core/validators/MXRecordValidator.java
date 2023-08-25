@@ -21,6 +21,8 @@ import com.sanctionco.jmail.JMail;
 import com.shieldblaze.extendedemailvalidator.core.NetworkConfig;
 import com.shieldblaze.extendedemailvalidator.core.ValidationContext;
 import com.shieldblaze.extendedemailvalidator.core.Validator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbill.DNS.AAAARecord;
 import org.xbill.DNS.ARecord;
 import org.xbill.DNS.ExtendedResolver;
@@ -37,11 +39,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
+
 public class MXRecordValidator implements Validator {
 
+    private static final Logger logger = LogManager.getLogger();
     private final ExtendedResolver resolver;
 
     public MXRecordValidator(NetworkConfig networkConfig) throws UnknownHostException {
+        requireNonNull(networkConfig, "NetworkConfig");
+
+        if (networkConfig.dnsServers().isEmpty()) {
+            resolver = new ExtendedResolver();
+            resolver.setTimeout(Duration.ofMillis(networkConfig.dnsTimeout()));
+            return;
+        }
+
         resolver = new ExtendedResolver(networkConfig.dnsServers().toArray(new String[0]));
         resolver.setTimeout(Duration.ofMillis(networkConfig.dnsTimeout()));
     }
@@ -50,6 +63,8 @@ public class MXRecordValidator implements Validator {
     public boolean isValid(ValidationContext validationContext, String email) throws IOException {
         Optional<Email> optionalEmail = JMail.tryParse(email);
         if (optionalEmail.isEmpty()) {
+            logger.debug("Address validation failed, address validation should be run first");
+            validationContext.markMxValidationFailed("Address validation should be run first");
             return false;
         }
 
@@ -61,6 +76,7 @@ public class MXRecordValidator implements Validator {
 
         // If no records found, return false
         if (records.length == 0) {
+            logger.debug("DNS Lookup returned no records in MX Record query");
             validationContext.markMxValidationFailed("DNS Lookup returned no records in MX Record query");
             return false;
         }
@@ -73,6 +89,7 @@ public class MXRecordValidator implements Validator {
 
         // If no MX records found, return false
         if (mxRecords.isEmpty()) {
+            logger.debug("DNS Lookup returned no MX records");
             validationContext.markMxValidationFailed("DNS Lookup returned no MX records");
             return false;
         }
@@ -84,6 +101,7 @@ public class MXRecordValidator implements Validator {
 
             Record[] aRecords = aRecordLookup.run();
             if (aRecords == null || aRecords.length == 0) {
+                logger.debug("DNS Lookup for MX Record Target returned no records in A Record query");
                 validationContext.markMxValidationFailed("DNS Lookup for MX Record Target returned no records in A Record query");
                 return false;
             }
@@ -94,6 +112,7 @@ public class MXRecordValidator implements Validator {
                     .toList();
 
             if (aRecordIps.isEmpty()) {
+                logger.debug("DNS Lookup for MX Record Target returned no A Records");
                 validationContext.markMxValidationFailed("DNS Lookup for MX Record Target returned no A Records");
                 return false;
             }
@@ -111,8 +130,10 @@ public class MXRecordValidator implements Validator {
 
             if (aaaaRecords == null || aaaaRecords.length == 0) {
                 if (alreadyHasIpv4) {
+                    logger.debug("DNS Lookup for MX Record Target returned no records in AAAA Record query, but already has IPv4 address");
                     break;
                 } else {
+                    logger.debug("DNS Lookup for MX Record Target returned no records in AAAA Record query");
                     validationContext.markMxValidationFailed("DNS Lookup for MX Record Target returned no records in AAAA Record query");
                     return false;
                 }
@@ -124,6 +145,7 @@ public class MXRecordValidator implements Validator {
                     .toList();
 
             if (aaaaRecordIps.isEmpty()) {
+                logger.debug("DNS Lookup for MX Record Target returned no AAAA Records");
                 validationContext.markMxValidationFailed("DNS Lookup for MX Record Target returned no AAAA Records");
                 return false;
             }
@@ -131,6 +153,7 @@ public class MXRecordValidator implements Validator {
             validationContext.mailServerIpv6Addresses().add(aaaaRecordIps.get(0).getHostAddress());
         }
 
+        logger.debug("MX Record validation passed");
         validationContext.markMxValidationPassed();
         return true;
     }

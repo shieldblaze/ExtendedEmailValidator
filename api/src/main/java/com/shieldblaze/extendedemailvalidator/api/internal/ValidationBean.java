@@ -20,6 +20,7 @@ import com.shieldblaze.extendedemailvalidator.core.NetworkConfig;
 import com.shieldblaze.extendedemailvalidator.core.ValidatingChain;
 import com.shieldblaze.extendedemailvalidator.core.validators.AddressValidator;
 import com.shieldblaze.extendedemailvalidator.core.validators.MXRecordValidator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -29,13 +30,18 @@ import java.util.List;
 @Component
 public class ValidationBean {
 
+    @Value("${dns-servers}")
+    private List<String> dnsServers;
+
+    @Value("${dns-timeout}")
+    private Integer dnsTimeout;
+
+    @Value("${socket-timeout}")
+    private Integer socketTimeout;
+
     @Bean
     public ValidatingChain validatingChain() throws UnknownHostException {
-        NetworkConfig networkConfig = new NetworkConfig(
-                List.of("8.8.8.8", "8.8.4.4"),
-                2500,
-                2500
-        );
+        NetworkConfig networkConfig = new NetworkConfig(dnsServers, dnsTimeout, socketTimeout);
         return new ValidatingChain(new AddressValidator(), new MXRecordValidator(networkConfig));
     }
 }

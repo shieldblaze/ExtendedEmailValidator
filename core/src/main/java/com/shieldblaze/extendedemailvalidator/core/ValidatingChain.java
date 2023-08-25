@@ -16,7 +16,13 @@
  */
 package com.shieldblaze.extendedemailvalidator.core;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class ValidatingChain {
+
+    private static final Logger logger = LogManager.getLogger();
+
     private final Validator[] validator;
 
     public ValidatingChain(Validator... validator) {
@@ -36,7 +42,10 @@ public class ValidatingChain {
         // Run each validator in the chain
         for (Validator validator : this.validator) {
             if (!validator.isValid(validationContext, email)) {
+                logger.debug("Validation failed by: {} for email: {}", validator.getClass().getSimpleName(), email);
                 break;
+            } else {
+                logger.debug("Validation passed by: {} for email: {}", validator.getClass().getSimpleName(), email);
             }
         }
 

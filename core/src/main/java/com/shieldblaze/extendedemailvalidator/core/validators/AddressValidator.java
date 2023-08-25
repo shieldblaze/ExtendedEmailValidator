@@ -19,15 +19,22 @@ package com.shieldblaze.extendedemailvalidator.core.validators;
 import com.sanctionco.jmail.JMail;
 import com.shieldblaze.extendedemailvalidator.core.ValidationContext;
 import com.shieldblaze.extendedemailvalidator.core.Validator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Performs validation of email address using Simple Email Validator.
  */
 public class AddressValidator implements Validator {
 
+    private static final Logger logger = LogManager.getLogger();
+
     @Override
     public boolean isValid(ValidationContext validationContext, String email) {
+        logger.debug("Validating address: {}", email);
+
         if (JMail.isValid(email)) {
+            logger.debug("Address validation passed");
             validationContext.markAddressValidationPassed();
             return true;
         } else {

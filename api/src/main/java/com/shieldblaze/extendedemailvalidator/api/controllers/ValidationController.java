@@ -20,6 +20,8 @@ import com.shieldblaze.extendedemailvalidator.api.dto.EmailValidation;
 import com.shieldblaze.extendedemailvalidator.api.internal.DelegatingValidationContext;
 import com.shieldblaze.extendedemailvalidator.core.ValidatingChain;
 import com.shieldblaze.extendedemailvalidator.core.ValidationContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +38,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/api/v1/validate")
 public class ValidationController {
 
+    private static final Logger logger = LogManager.getLogger();
+
     private final ValidatingChain validatingChain;
 
     public ValidationController(ValidatingChain validatingChain) {
@@ -49,6 +53,7 @@ public class ValidationController {
                 ValidationContext result = validatingChain.validate(emailValidation.emailAddress());
                 return ok(new DelegatingValidationContext(result));
             } catch (Exception e) {
+                logger.debug("Error validating email address", e);
                 throw new RuntimeException(e);
             }
         }).exceptionally(throwable -> badRequest(throwable.getMessage()));

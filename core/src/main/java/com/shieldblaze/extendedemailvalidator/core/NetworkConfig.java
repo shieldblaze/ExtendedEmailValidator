@@ -16,6 +16,9 @@
  */
 package com.shieldblaze.extendedemailvalidator.core;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.List;
 
 /**
@@ -26,6 +29,8 @@ import java.util.List;
  * @param socketTimeout timeout in milliseconds for socket connections
  */
 public record NetworkConfig(List<String> dnsServers, int dnsTimeout, int socketTimeout) {
+
+    private static final Logger logger = LogManager.getLogger();
 
     public NetworkConfig(List<String> dnsServers, int dnsTimeout, int socketTimeout) {
         this.dnsServers = dnsServers;
@@ -43,5 +48,7 @@ public record NetworkConfig(List<String> dnsServers, int dnsTimeout, int socketT
         if (!(socketTimeout > 0)) {
             throw new IllegalArgumentException("socketTimeout must be greater than 0");
         }
+
+        logger.info("NetworkConfig initialized with DNS servers: {}, DNS timeout: {} and Socket Timeout: {}", dnsServers, dnsTimeout, socketTimeout);
     }
 }
