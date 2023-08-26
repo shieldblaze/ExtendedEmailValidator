@@ -18,13 +18,16 @@ package com.shieldblaze.extendedemailvalidator.api.internal;
 
 import com.shieldblaze.extendedemailvalidator.core.NetworkConfig;
 import com.shieldblaze.extendedemailvalidator.core.ValidatingChain;
+import com.shieldblaze.extendedemailvalidator.core.Validator;
 import com.shieldblaze.extendedemailvalidator.core.validators.AddressValidator;
 import com.shieldblaze.extendedemailvalidator.core.validators.MXRecordValidator;
+import com.shieldblaze.extendedemailvalidator.core.validators.MailServerConnection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -39,9 +42,29 @@ public class ValidationBean {
     @Value("${socket-timeout}")
     private Integer socketTimeout;
 
+    @Value("${mx-validator-enabled}")
+    private Boolean mxValidatorEnabled;
+
+    @Value("${server-connection-validator-enabled}")
+    private Boolean serverConnectionValidator;
+
     @Bean
     public ValidatingChain validatingChain() throws UnknownHostException {
         NetworkConfig networkConfig = new NetworkConfig(dnsServers, dnsTimeout, socketTimeout);
-        return new ValidatingChain(new AddressValidator(), new MXRecordValidator(networkConfig));
+        List<Validator> validators = new ArrayList<>();
+        validators.add(new AddressValidator());
+
+        // Add MX validator if enabled
+        if (mxValidatorEnabled) {
+            validators.add(new MXRecordValidator(networkConfig));
+        }
+
+        // Add server connection validator if enabled
+        if (serverConnectionValidator) {
+            validators.add(new MailServerConnection(networkConfig));
+        }
+
+        // Create validating chain with all validators
+        return new ValidatingChain(validators.toArray(Validator[]::new));
     }
 }
