@@ -1,0 +1,21 @@
+name: Testing
+
+on: [push]
+
+jobs:
+  echo_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 17
+          architecture: x64
+
+      - name: Run Tests
+        run: mvn -ntp -B test
